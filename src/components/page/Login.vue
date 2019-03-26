@@ -28,9 +28,9 @@ export default {
     data: function() {
         return {
             ruleForm: {
-                username: "admin",
+                username: "jyly",
                 password: "123456",
-                isSystemAdmin: true
+                isSystemAdmin: false
             },
             rules: {
                 username: [
@@ -59,6 +59,7 @@ export default {
                         });
 
                         setStore('token',res.data.data.token);
+                        setStore('projectId',res.data.data.projectList[0].id);
                         setStore('ms_username',this.ruleForm.username);
                         this.$router.push({ path: "/" }); //如果请求成功就让他3秒跳转路由
 

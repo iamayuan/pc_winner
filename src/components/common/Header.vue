@@ -74,6 +74,8 @@ export default {
         handleCommand(command) {
             if (command == "loginout") {
                 localStorage.removeItem("ms_username");
+                localStorage.removeItem("token");
+                localStorage.removeItem("projectId");
                 this.$router.push("/login");
             }
             if (command == "password") {

@@ -5,12 +5,12 @@
  * 
  */
 let baseUrl = ''; 
-let baseImgPath = 'https://tulaoban.oss-cn-shanghai.aliyuncs.com/';
+let baseImgPath = 'https://juxuan.oss-cn-hangzhou.aliyuncs.com/';
 
 if (process.env.NODE_ENV == 'development') {
 	baseUrl = '/api';
 }else{
-	baseUrl = 'http://wechatcw.yiung.com:8080';
+	baseUrl = 'https://wechat.nbjuxuan.com';
 }
 
 export {

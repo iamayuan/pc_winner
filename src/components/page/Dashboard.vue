@@ -36,11 +36,6 @@ export default {
             userData: {}
         };
     },
-    // computed: {
-    //     role() {
-    //         return this.name == "超级管理员" ? "超级管理员" : "普通用户";
-    //     }
-    // },
     created() {
         this.getData();
     },

@@ -2,7 +2,7 @@
     <div class="userList">
 
         <!-- Form -->
-        <el-button type="primary" icon="delete" class="handle-del mr10 mb10" @click="dialogFormVisible = true">新增用户</el-button>
+        <el-button type="primary" icon="delete" class="handle-del mr10 mb10" @click="dialogFormVisible = true" v-if="isShow">新增用户</el-button>
         <el-button type="primary" icon="delete" class="handle-del mr10 mb10" @click="modFormVisible = true" mod>编辑用户</el-button>
         <el-dialog title="新增用户" :visible.sync="dialogFormVisible">
             <el-form :model="addForm" :rules="rules" ref="addForm">
@@ -96,7 +96,6 @@
                                 <img src="static/img/img.jpg" class="user-avator" alt="">
                                 <div class="user-info-cont">
                                     <div>姓名：{{userData.name}}</div>
-                                    <div>项目管理员id：{{userData.id}}</div>
                                     <div>性别：{{userData.gender}}</div>
                                     <div>地址：{{userData.address}}</div>
                                 </div>
@@ -117,8 +116,10 @@ import api from "@/apis";
 export default {
     data() {
         return {
+            isShow:false,
             dialogFormVisible: false,
             modFormVisible:false,
+            id:'',//用户id
             addForm: {
                 userName: "",
                 password: "",
@@ -162,6 +163,13 @@ export default {
     },
     created() {
         this.getData();
+        if(getStore("isSystemAdmin")=='1'){
+            this.isShow = true
+        }else{
+            this.isShow = false
+        }
+        
+
     },
     methods: {
         async addUser(formName) {
@@ -207,17 +215,17 @@ export default {
             this.$refs[formName].validate(async valid => {
                 if (valid) {
                     const res = await api.modUser({
+                        id:this.id,
                         token: getStore("token"), //String//	必填	密钥
-                        password: this.addForm.password, //	String	必填	密码
-                        name: this.addForm.name, //	String	可选	姓名
-                        address: this.addForm.address, //	String	可选	地址
-                        bnankCardNumber: this.addForm.bnankCardNumber, //String	可选	银行卡号
-                        telephone: this.addForm.telephone, //	String	可选	手机号
-                        wechatNumber: this.addForm.wechatNumber, //	String	可选	微信号
-                        userType: this.addForm.userType, //,	Integer	可选	类型 1 项目老板 2 项目管理员 3 企业客户 1-2允许登陆web管理后台，其他不允许
-                        gender: this.addForm.gender //	Integer	可选	性别 0女 1男 2保密
+                        password: this.modForm.password, //	String	必填	密码
+                        name: this.modForm.name, //	String	可选	姓名
+                        address: this.modForm.address, //	String	可选	地址
+                        bnankCardNumber: this.modForm.bnankCardNumber, //String	可选	银行卡号
+                        telephone: this.modForm.telephone, //	String	可选	手机号
+                        wechatNumber: this.modForm.wechatNumber, //	String	可选	微信号
+                        userType: this.modForm.userType, //,	Integer	可选	类型 1 项目老板 2 项目管理员 3 企业客户 1-2允许登陆web管理后台，其他不允许
+                        gender: this.modForm.gender //	Integer	可选	性别 0女 1男 2保密
                     });
-                    console.log(res.data);
                     if (res.data.code == "0") {
                         console.log(res);
                         this.$message({
@@ -246,8 +254,6 @@ export default {
                 token: getStore("token")
             });
             if (res.data.code == "0") {
-
-
                 if (res.data.data.gender == "0") {
                     res.data.data.gender = "女";
                 }
@@ -257,7 +263,39 @@ export default {
                 if (res.data.data.gender == "2") {
                     res.data.data.gender = "保密";
                 }
+                if (res.data.data.type == "1") {
+                    res.data.data.type = "项目老板";
+                }
+                if (res.data.data.type == "2") {
+                    res.data.data.type = "项目管理员";
+                }
+                if (res.data.data.type == "3") {
+                    res.data.data.type = "企业客户";
+                }
                 this.userData = res.data.data;
+                this.id=  res.data.data.id;
+                this.modForm.name =  res.data.data.name;
+                this.modForm.address = res.data.data.address ;
+                this.modForm.bnankCardNumber = res.data.data.bank_card_number;
+                this.modForm.telephone =res.data.data.phone ;
+                this.modForm.wechatNumber = res.data.data.wechat_number;
+                this.modForm.userType = res.data.data.type;
+                this.modForm.gender = res.data.data.gender
+            }else{
+                if(res.data.msg=='登录失败！'){
+                    this.$message({
+                        type: "error",
+                        message: res.data.msg
+                    });
+                    setTimeout(function () {
+						this.$router.push({ path: "/login" });
+					}, 2000);
+                }else{
+                    this.$message({
+                        type: "error",
+                        message: res.data.msg
+                    });
+                }
             }
         }
     }
